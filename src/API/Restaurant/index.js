@@ -1,8 +1,11 @@
 import express from "express";
 
 import { RestaurantModel } from "../../database/restaurant";
-import { ValidateRestaurantCity,ValidateRestaurantSearchString } from '../../validation/restaurant';
-import { ValidateId } from '../../validation/common'
+import {
+  ValidateRestaurantCity,
+  ValidateRestaurantSearchString,
+} from "../../validation/restaurant";
+import { ValidateId } from "../../validation/common";
 // create a router
 const Router = express.Router();
 
@@ -23,9 +26,9 @@ Router.get("/", async (req, res) => {
     }
 
     return res.json({ restaurants });
-  } catch(error){
-    return res.status(500).json({error : error.message});
-}
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 /**
@@ -35,18 +38,19 @@ Router.get("/", async (req, res) => {
  * Access       Public
  * Method       GET
  */
-// http://localhost:4000/restaurant/12454dsfdofi438532
-Router.get("/:_id", async (req,res) => {
-    try{
-       await ValidateId(req.params);
-        const { _id } = req.params;
+// http://localhost:5000/restaurant/12454dsfdofi438532
+Router.get("/:_id", async (req, res) => {
+  try {
+    await ValidateId(req.params);
+    const { _id } = req.params;
     const restaurant = await RestaurantModel.findById(_id);
-    if(!restaurant){return res.json({error : "No restaurant found"})};
-    return res.json({restaurant});
+    if (!restaurant) {
+      return res.json({ error: "No restaurant found" });
     }
-    catch(error){
-        return res.status(500).json({error : error.message});
-    }
+    return res.json({ restaurant });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 /**
@@ -56,20 +60,22 @@ Router.get("/:_id", async (req,res) => {
  * Access       Public
  * Method       GET
  */
-Router.get("/search", async(req,res) =>{
-    try{
-        await ValidateRestaurantSearchString(req.params);
-        const { search } = req.params;
+Router.get("/search", async (req, res) => {
+  try {
+    await ValidateRestaurantSearchString(req.params);
+    const { search } = req.params;
     const restaurant = await RestaurantModel.find({
-        name : {$regex : search, $options : "i"},
+      name: { $regex: search, $options: "i" },
     });
-    if(!restaurant) {
-        return res.status(404).json({error : `no restaurant matched with ${search} `})
-    };
+    if (!restaurant) {
+      return res
+        .status(404)
+        .json({ error: `no restaurant matched with ${search} ` });
+    }
     return res.json({ restaurant });
-    }catch (error) {
-        return res.status(500).json({ error: error.message });
-      }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 export default Router;
